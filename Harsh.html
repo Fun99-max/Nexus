@@ -1,0 +1,452 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoImpact App</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Poppins', sans-serif;
+        overflow-x: hidden;
+        background: #f0fff4;
+    }
+
+    /* ✅ LOADING SCREEN */
+    #loadingScreen {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background: url('https://images.unsplash.com/photo-1523978591478-c753949ff840') no-repeat center center/cover;
+        color: white;
+        z-index: 9999;
+    }
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+		}
+    .logo-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #34a853, #0f9d58);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .logo-text {
+        font-size: 40px;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+    }
+    .logo-text span { color: #a7f3d0; }
+    .loading-bar {
+        width: 200px;
+        height: 10px;
+        background: rgba(255,255,255,0.4);
+        border-radius: 5px;
+        overflow: hidden;
+        margin-top: 20px;
+    }
+    .progress {
+        width: 0%;
+        height: 100%;
+        background: #2ecc71;
+        animation: load 3s linear forwards;
+    }
+    @keyframes load {
+        0% { width: 0%; }
+        100% { width: 100%; }
+    }
+    .loading-text {
+        margin-top: 10px;
+        font-size: 18px;
+        text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
+    }
+
+    /* ✅ LOGIN SCREEN */
+    #loginScreen {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #10b981, #34d399);
+        color: white;
+        text-align: center;
+        flex-direction: column;
+    }
+    #loginScreen input {
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        width: 250px;
+        font-size: 18px;
+        margin: 10px 0;
+        text-align: center;
+    }
+    #loginScreen button {
+        background: white;
+        color: #065f46;
+        font-weight: 600;
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        border: none;
+    }
+
+    /* ✅ MAIN APP */
+    #mainApp { display: none; }
+    header {
+        background: linear-gradient(90deg, #059669, #10b981);
+        color: white;
+        text-align: center;
+        padding: 20px;
+        font-size: 32px;
+        font-weight: 700;
+		}
+    nav {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        background: #065f46;
+        padding: 12px;
+    }
+    nav a { color: white; text-decoration: none; font-weight: 600; }
+    .container { max-width: 1200px; margin: auto; padding: 20px; }
+    .section {
+        background: rgba(255,255,255,0.9);
+        padding: 25px;
+        margin-bottom: 25px;
+        border-radius: 18px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h2 { color: #047857; }
+
+    /* ✅ REWARD CONVERTER */
+    .converter-box {
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        width: 300px;
+        margin: 20px auto;
+        text-align: center;
+    }
+    .converter-box input { width: 90%; padding: 10px; margin: 10px 0; font-size: 16px; }
+    .btn {
+        background: #28a745;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        border: none;
+    }
+    .btn:hover { background: #218838; }
+    .result { margin-top: 10px; font-size: 18px; }
+
+    /* ✅ Emergency Section */
+    .emergency-section {
+        background: #fff3f3;
+        padding: 20px;
+        margin: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .emergency-section h2 {
+        color: #e60000;
+        margin-bottom: 10px;
+    }
+    .emergency-section ul {
+        list-style: none;
+        margin-top: 10px;
+        padding: 0;
+    }
+    .emergency-section li {
+        font-size: 18px;
+        margin: 8px 0;
+    }
+    .emergency-section a {
+        color: #e60000;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .sos-btn {
+        background: #e60000;
+        color: white;
+        font-size: 20px;
+        padding: 12px 25px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        margin: 15px 0;
+        font-weight: bold;
+    }
+	.sos-btn:hover { background: #cc0000; }
+    .floating-sos {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #e60000;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 70px;
+        height: 70px;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .floating-sos:hover { background: #cc0000; }
+</style>
+</head>
+<body>
+
+<!-- ✅ LOADING SCREEN -->
+<div id="loadingScreen">
+    <div class="logo">
+        <div class="logo-icon">🌱</div>
+        <div class="logo-text">Eco<span>Impact</span></div>
+    </div>
+    <div class="loading-bar"><div class="progress"></div></div>
+    <div class="loading-text">Loading...</div>
+</div>
+
+<!-- ✅ LOGIN SCREEN -->
+<div id="loginScreen">
+    <h1>Welcome to EcoImpact 🌱</h1>
+    <p>Enter your name to start your eco journey</p>
+    <input type="text" id="username" placeholder="Your Name">
+    <button onclick="login()">Start</button>
+</div>
+
+<!-- ✅ MAIN APP -->
+<div id="mainApp">
+<header>🌍 EcoImpact Social</header>
+<nav>
+    <a href="#post">Post Action</a>
+    <a href="#score">Eco Score</a>
+    <a href="#challenge">Challenge</a>
+    <a href="#feed">Feed</a>
+</nav>
+
+<div class="container">
+    <section id="challenge" class="section">
+        <h2>🌍 Today's Eco Challenge</h2>
+        <div id="challengeBox"></div>
+        <button onclick="newChallenge()">New Challenge</button>
+    </section>
+
+    <section id="post" class="section">
+        <h2>Share Your Eco Action</h2>
+        <input type="text" id="actionTitle" placeholder="What did you do?">
+        <textarea id="actionDetails" placeholder="Describe your action..."></textarea>
+        <button onclick="postAction()">Post Action</button>
+        <p id="actionMsg" style="color:red;"></p>
+    </section>
+
+    <section id="score" class="section">
+        <h2>My Eco Score</h2>
+        <div class="eco-score-value" id="ecoScore">0 Points</div>
+    </section>
+
+    <!-- ✅ Reward Converter -->
+    <div class="converter-box">
+	<input type="number" id="points" placeholder="Enter your points" />
+        <h2>Change Points to Rupees</h2>
+        <h2>Change Points to Rupees</h2>
+        <button class="btn" onclick="convertPoints()">Convert</button>
+        <div class="result" id="result"></div>
+        <button class="btn" style="margin-top:10px;background:#007bff;" onclick="claimReward()">Claim Reward</button>
+    </div>
+</div>
+<!-- ✅ Group Challenges -->
+<div class="challenges">
+    <h2>🏆🏆 Do some Group Challenges for enviroment🏆🏆</h2>
+    <div class="challenge">
+        <h4>         Plant 100 Trees </h4>
+		<h4>        use less water  </h4>
+		<h4>        give water for 100 plants </h4>
+		<h4>        use puplic stranspot of 3 days </h4>
+        <div class="progress-bar"><div class="progress" style="width:70%"></div></div>
+    </div>
+    <div class="challenge">
+	
+
+        <h4>        Plastic-Free Week</h4>
+        <div class="progress-bar"><div class="progress" style="width:45%"></div></div>
+    </div>
+	
+    <div class="challenge">
+	
+        <h4>        Clean-Up Drive</h4>
+        <div class="progress-bar"><div class="progress" style="width:90%"></div></div>
+		
+
+		<h4>            !!!!!!!!pick anyone by your choice!!!!!!!!</h4>
+		You sent
+ <!-- ✅ Upload Eco Post -->
+<div class="upload-section">
+    <label for="upload" class="upload-label">📤 Upload Eco Post</label>
+    <input type="file" id="upload" accept="image/*,video/*" onchange="previewPost(event)">
+</div>
+<!-- ✅ Eco Feed -->
+<div class="feed" id="feed">
+    <div class="post">
+        <source src="videos/planting.mp4" type="video/mp4">
+        <div class="info">
+            <h3>@Alice</h3>
+            <p>Planted a tree today 🌱 #GoGreen</p>
+        </div>
+    </div>
+    <div class="post">
+        <video controls>
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+        </video>
+        <div class="info">
+            <h3>@Bob</h3>
+			<video controls>
+			   <source Video= "https://www.pexels.com/video/two-people-riding-bicycles-in-an-empty-road-3111466/">
+				</video>
+        </div>
+    </div>
+</div>
+<h1>EcoImpact Leaderboard 🌿</h1>
+<div class="leaderboard">
+    <div class="leaderboard-header">Leaderboard of the Week</div>
+    <ul id="leaderboard-list">
+        <li><span class="name">Loading...</span><span class="points"></span></li>
+    </ul>
+</div>
+
+<button class="refresh-btn" onclick="loadLeaderboard()">🔄 Refresh</button>
+
+<script>
+    const leaderboardData = [
+        { name: "Aarav", points: 880 },
+        { name: "Meera", points: 820 },
+        { name: "Kabir", points: 770 },
+        { name: "Ishita", points: 720 },
+        { name: "Rohan", points: 700 }
+    ];
+	function loadLeaderboard() {
+        const list = document.getElementById("leaderboard-list");
+        list.innerHTML = "";
+        leaderboardData.forEach((player, index) => {
+            const li = document.createElement("li");
+            li.innerHTML = `<span class="name">${index + 1}. ${player.name}</span>
+                            <span class="points">${player.points} pts</span>`;
+            list.appendChild(li);
+        });
+    }
+
+    // Load leaderboard on page load
+    loadLeaderboard();
+</script>
+<!-- ✅ Emergency Section -->
+<div class="emergency-section">
+    <h2>🚨 Emergency Contacts</h2>
+    <p>If you need urgent help, use the SOS button or call the numbers below:</p>
+    <button class="sos-btn" onclick="sendSOS()">🚨 SOS</button>
+    <ul>
+        <li>👮 Police: <a href="tel:112">112</a></li>
+        <li>🚑 Ambulance: <a href="tel:108">108</a></li>
+        <li>🔥 Fire: <a href="tel:101">101</a></li>
+    </ul>
+</div>
+</div>
+
+
+<!-- ✅ Floating SOS Button -->
+<button class="floating-sos" onclick="sendSOS()">SOS</button>
+
+<script>
+    // ✅ Loading Screen
+    setTimeout(() => {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'flex';
+    }, 3500);
+	let score = 0;
+    let lastPostDate = null;
+
+    function login() {
+        const name = document.getElementById('username').value.trim();
+        if (name) {
+            localStorage.setItem('ecoUser', name);
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            newChallenge();
+        }
+    }
+
+    function postAction() {
+        const today = new Date().toDateString();
+        if (lastPostDate === today) {
+            document.getElementById('actionMsg').innerText = "You can post only once today!";
+            return;
+        }
+        const title = document.getElementById('actionTitle').value;
+        const details = document.getElementById('actionDetails').value;
+        if (title && details) {
+            score += 10;
+            document.getElementById('ecoScore').innerText = score + " Points";
+            lastPostDate = today;
+            document.getElementById('actionMsg').innerText = "✅ Action posted successfully!";
+        } else {
+            document.getElementById('actionMsg').innerText = "Fill all fields!";
+        }
+    }
+	const challenges = [
+        "Go plastic-free for the day 🌍",
+        "Bike or walk instead of using a car 🚴",
+        "Plant a tree or water plants 🌱",
+        "Reduce water usage by 20% today 💧",
+        "Recycle 8 items in a day ♻️",
+        "Clean your neighborhood park 🏞",
+        "Meat-free meal today 🍀"
+    ];
+    function newChallenge() {
+        let randomIndex = Math.floor(Math.random() * challenges.length);
+        document.getElementById('challengeBox').innerText = challenges[randomIndex];
+    }
+
+    function convertPoints() {
+        let points = parseInt(document.getElementById('points').value);
+        if (isNaN(points) || points <= 0) {
+            document.getElementById('result').innerText = "Please enter valid points.";
+             return ;
+        }
+        let rupees = (points / 100) * 5;
+        document.getElementById('result').innerText = "You will get ₹" + rupees.toFixed(2);
+    }
+
+    function claimReward() {
+        let resultText = document.getElementById('result').innerText;
+        if (resultText.includes("₹")) {
+            alert("Reward claimed successfully!");
+        } else {
+            alert("Please convert points first.");
+        }
+    }
+
+    function sendSOS() {
+        alert("🚨 SOS Alert Sent! (You can integrate GPS or call API here)");
+        // Example for calling: window.location.href = "tel:112";
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #ffd700;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .scoreboard {
+            display: flex;
+            gap: 30px;
+        }
+
+        .score, .wickets, .overs {
+            text-align: center;
+        }
+
+        .score-value, .wickets-value, .overs-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4caf50;
+        }
+
+        .game-area {
+            position: relative;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #gameCanvas {
+            background: linear-gradient(135deg, #228b22 0%, #32cd32 100%);
+            border: 4px solid #8b4513;
+            border-radius: 15px;
+            display: block;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .shot-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .shot-btn {
+            padding: 12px;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .shot-btn span.key {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            line-height: 1.6;
+        }
+
+        .instructions h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .key-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .key-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .key {
+            background: #ffd700;
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+
+        .game-over h2 {
+            color: #ff6b6b;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1100px) {
+            #gameCanvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .shot-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .key-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏏 Cricket Master</h1>
+        
+        <div class="game-info">
+            <div class="scoreboard">
+                <div class="score">
+                    <div>SCORE</div>
+                    <div class="score-value" id="score">0/0</div>
+                </div>
+                <div class="wickets">
+                    <div>WICKETS</div>
+                    <div class="wickets-value" id="wickets">0</div>
+                </div>
+                <div class="overs">
+                    <div>OVERS</div>
+                    <div class="overs-value" id="overs">0.0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <canvas id="gameCanvas" width="1000" height="600"></canvas>
+            
+            <div class="game-over" id="gameOver">
+                <h2>Game Over!</h2>
+                <p>Final Score: <span id="finalScore">0</span> runs</p>
+                <button onclick="resetGame()">Play Again</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="bowl()">BOWL</button>
+        </div>
+
+        <div class="shot-buttons">
+            <button class="shot-btn" onclick="playShot('defensive')"><span class="key">1</span>Defensive Shot</button>
+            <button class="shot-btn" onclick="playShot('drive')"><span class="key">2</span>Straight Drive</button>
+            <button class="shot-btn" onclick="playShot('cut')"><span class="key">3</span>Cut Shot</button>
+            <button class="shot-btn" onclick="playShot('pull')"><span class="key">4</span>Pull Shot</button>
+            <button class="shot-btn" onclick="playShot('sweep')"><span class="key">5</span>Sweep Shot</button>
+            <button class="shot-btn" onclick="playShot('loft')"><span class="key">6</span>Lofted Shot</button>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <p>• Click "BOWL" to start the delivery</p>
+            <p>• Choose a shot type using the buttons or keyboard keys</p>
+            <p>• Score runs based on your shot timing and selection</p>
+            <p>• Avoid getting out - you have 10 wickets!</p>
+            <p>• Each over consists of 6 balls</p>
+            
+            <div class="key-controls">
+                <div class="key-item">
+                    <span class="key">1</span>
+                    <span>Defensive Shot</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">2</span>
+                    <span>Straight Drive</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">3</span>
+                    <span>Cut Shot</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">4</span>
+                    <span>Pull Shot</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">5</span>
+                    <span>Sweep Shot</span>
+                </div>
+                <div class="key-item">
+                    <span class="key">6</span>
+                    <span>Lofted Shot</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game state
+        let score = 0;
+        let wickets = 0;
+        let balls = 0;
+        let overs = 0;
+        let gameActive = true;
+        let ballInPlay = false;
+        let ballX = 0;
+        let ballY = 0;
+        let ballSpeed = 0;
+        let ballAngle = 0;
+        let shotType = '';
+        let shotPower = 0;
+        let batsmanX = 500;
+        let batsmanY = 450;
+
+        // Update score display
+        function updateScoreDisplay() {
+            document.getElementById('score').textContent = `${score}/${wickets}`;
+            document.getElementById('wickets').textContent = wickets;
+            document.getElementById('overs').textContent = `${overs}.${balls}`;
+        }
+
+        // Draw cricket pitch
+        function drawPitch() {
+            // Green background (already set in CSS)
+            
+            // Pitch
+            ctx.fillStyle = '#d2b48c';
+            ctx.fillRect(450, 200, 100, 300);
+            
+            // Pitch markings
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(450, 200, 100, 300);
+            
+            // Crease lines
+            ctx.beginPath();
+            ctx.moveTo(400, 300);
+            ctx.lineTo(600, 300);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(400, 400);
+            ctx.lineTo(600, 400);
+            ctx.stroke();
+            
+            // Stumps
+            drawStumps(500, 200);
+            drawStumps(500, 500);
+        }
+
+        function drawStumps(x, y) {
+            ctx.fillStyle = '#8b4513';
+            // Three stumps
+            ctx.fillRect(x - 15, y, 5, 25);
+            ctx.fillRect(x, y, 5, 25);
+            ctx.fillRect(x + 15, y, 5, 25);
+            
+            // Bails
+            ctx.fillStyle = 'white';
+            ctx.fillRect(x - 15, y, 35, 3);
+        }
+
+        function drawBatsman() {
+            // Batsman body
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(batsmanX, batsmanY, 18, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Bat
+            ctx.fillStyle = '#8b4513';
+            ctx.fillRect(batsmanX + 12, batsmanY - 35, 6, 50);
+        }
+
+        function drawBowler() {
+            // Bowler body
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(500, 150, 18, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawBall() {
+            if (ballInPlay) {
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add a trail effect to make ball movement more visible
+                ctx.globalAlpha = 0.5;
+                ctx.beginPath();
+                ctx.arc(ballX - Math.cos(ballAngle) * 15, ballY - Math.sin(ballAngle) * 15, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        function drawFielders() {
+            // Fielders around the ground - positioned further out for larger field
+            const fielders = [
+                {x: 250, y: 150, color: '#3498db'},
+                {x: 750, y: 150, color: '#3498db'},
+                {x: 200, y: 250, color: '#3498db'},
+                {x: 800, y: 250, color: '#3498db'},
+                {x: 150, y: 350, color: '#3498db'},
+                {x: 850, y: 350, color: '#3498db'},
+                {x: 200, y: 450, color: '#3498db'},
+                {x: 800, y: 450, color: '#3498db'},
+                {x: 250, y: 550, color: '#3498db'},
+                {x: 750, y: 550, color: '#3498db'}
+            ];
+            
+            fielders.forEach(fielder => {
+                ctx.fillStyle = fielder.color;
+                ctx.beginPath();
+                ctx.arc(fielder.x, fielder.y, 15, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPitch();
+            drawBatsman();
+            drawBowler();
+            drawBall();
+            drawFielders();
+            
+            // Draw boundary line
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([10, 15]);
+            ctx.beginPath();
+            ctx.arc(500, 350, 250, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function updateBall() {
+            if (!ballInPlay) return;
+            
+            ballX += Math.cos(ballAngle) * ballSpeed;
+            ballY += Math.sin(ballAngle) * ballSpeed;
+            
+            // Check if ball reaches batsman
+            if (ballY >= 420 && Math.abs(ballX - batsmanX) < 35) {
+                resolveShot();
+            }
+            
+            // Check if ball hits wicket
+            if (ballY >= 480 && Math.abs(ballX - 500) < 25) {
+                wicket();
+            }
+            
+            // Check if ball goes out of bounds (boundary)
+            const distanceFromCenter = Math.sqrt(Math.pow(ballX - 500, 2) + Math.pow(ballY - 350, 2));
+            if (distanceFromCenter > 250) {
+                // Ball crossed boundary - automatic 4 or 6
+                if (ballY < 350) {
+                    score += 6; // Six!
+                } else {
+                    score += 4; // Four!
+                }
+                updateScoreDisplay();
+                ballInPlay = false;
+                updateOver();
+                return;
+            }
+            
+            // Check if ball goes out of canvas
+            if (ballX < 0 || ballX > canvas.width || ballY < 0 || ballY > canvas.height) {
+                ballInPlay = false;
+                updateOver();
+            }
+        }
+
+        function bowl() {
+            if (!gameActive || ballInPlay) return;
+            
+            ballInPlay = true;
+            ballX = 500;
+            ballY = 150;
+            ballSpeed = 10;
+            ballAngle = Math.PI / 2; // Straight down
+            
+            // Add some randomness to bowling - wider angles for bigger field
+            ballAngle += (Math.random() - 0.5) * 0.5;
+        }
+
+        function playShot(type) {
+            if (!ballInPlay) return;
+            
+            shotType = type;
+            const timing = Math.random(); // 0-1, higher is better
+            
+            switch(type) {
+                case 'defensive':
+                    shotPower = timing * 2;
+                    break;
+                case 'drive':
+                    shotPower = timing * 8;
+                    break;
+                case 'cut':
+                    shotPower = timing * 6;
+                    break;
+                case 'pull':
+                    shotPower = timing * 6;
+                    break;
+                case 'sweep':
+                    shotPower = timing * 4;
+                    break;
+                case 'loft':
+                    shotPower = timing * 12;
+                    break;
+            }
+        }
+
+        function resolveShot() {
+            if (!shotType) {
+                // Missed shot - could be out
+                if (Math.random() < 0.3) {
+                    wicket();
+                } else {
+                    ballInPlay = false;
+                    updateOver();
+                }
+                return;
+            }
+            
+            // Calculate runs based on shot power and type
+            let runs = 0;
+            if (shotPower > 0.8) {
+                runs = shotType === 'loft' ? 6 : 4;
+            } else if (shotPower > 0.5) {
+                runs = Math.floor(shotPower * 3) + 1;
+            } else if (shotPower > 0.2) {
+                runs = 1;
+            }
+            
+            // Chance of getting out on aggressive shots
+            if ((shotType === 'loft' && Math.random() < 0.4) || 
+                (shotType !== 'defensive' && Math.random() < 0.1)) {
+                wicket();
+                return;
+            }
+            
+            score += runs;
+            updateScoreDisplay();
+            
+            // Set ball trajectory based on shot type with wider angles for bigger field
+            switch(shotType) {
+                case 'drive':
+                    ballAngle = Math.PI / 2;
+                    break;
+                case 'cut':
+                    ballAngle = Math.PI / 3;
+                    break;
+                case 'pull':
+                    ballAngle = 2 * Math.PI / 3;
+                    break;
+                case 'sweep':
+                    ballAngle = Math.PI;
+                    break;
+                case 'loft':
+                    ballAngle = Math.PI / 2;
+                    break;
+            }
+            
+            ballSpeed = shotPower * 20; // Faster ball speed for bigger field
+            shotType = '';
+        }
+
+        function wicket() {
+            wickets++;
+            updateScoreDisplay();
+            ballInPlay = false;
+            
+            if (wickets >= 10) {
+                gameOver();
+            } else {
+                updateOver();
+            }
+        }
+
+        function updateOver() {
+            balls++;
+            if (balls >= 6) {
+                balls = 0;
+                overs++;
+            }
+            updateScoreDisplay();
+            ballInPlay = false;
+            shotType = '';
+        }
+
+        function gameOver() {
+            gameActive = false;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('finalScore').textContent = score;
+        }
+
+        function resetGame() {
+            score = 0;
+            wickets = 0;
+            balls = 0;
+            overs = 0;
+            gameActive = true;
+            ballInPlay = false;
+            updateScoreDisplay();
+            document.getElementById('gameOver').style.display = 'none';
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (gameActive) {
+                updateBall();
+                draw();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Initialize game
+        updateScoreDisplay();
+        gameLoop();
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (!ballInPlay) return;
+            
+            switch(e.key) {
+                case '1': playShot('defensive'); break;
+                case '2': playShot('drive'); break;
+                case '3': playShot('cut'); break;
+                case '4': playShot('pull'); break;
+                case '5': playShot('sweep'); break;
+                case '6': playShot('loft'); break;
+            }
+        });
+    </script>
+</body>
+</html>
+
